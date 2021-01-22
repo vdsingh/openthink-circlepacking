@@ -1,15 +1,15 @@
 import React, { useRef, useEffect } from "react";
 import "./App.css";
 import * as d3 from "d3";
-import { data } from "./data/data.js";
+// import { data } from "./data/data.js";
 
 import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
 
 function App() {
   const svgRef = useRef();
 
-  const width = 800;
-  const height = 800;
+  const width = 500;
+  const height = 500;
 
   // will be called initially and on every data change
   useEffect(() => {
@@ -47,7 +47,9 @@ function App() {
     node
       .append("circle")
       .attr("r", (d) => d.r)
-      .attr("fill", (d) => color(d.height));
+      .attr("fill", (d) => d.data.color);
+
+    // .attr("fill", (d) => color(d.height));
 
     const leaf = node.filter((d) => !d.children);
 
@@ -73,7 +75,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <svg ref={svgRef}></svg>
+      <svg ref={svgRef} width={width} height={height}></svg>
     </React.Fragment>
   );
 }
@@ -85,11 +87,18 @@ function formatData(posts, relations) {
   //map to get posts by id {postID, postObject}
   let postsMap = new Map();
 
+  let colorMap = new Map();
+  colorMap.set("Idea", "rgb(51,102,255)");
+  colorMap.set("Topic", "rgb(51,102,255)");
+  colorMap.set("Concern", "rgb(255,0,0)");
+  colorMap.set("Information", "rgb(224,224,209)");
+
   //map each post by ID
   posts.forEach((post) => {
     //give each post object a children array
     post.children = [];
     post.value = Math.floor(Math.random() * 100);
+    post.color = colorMap.get(post.type);
 
     //map each post by its ID
     postsMap.set(post._id, post);
@@ -106,7 +115,13 @@ function formatData(posts, relations) {
     if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
   }
 
-  return roots.length === 1 ? roots[0] : { value: 1, children: roots };
+  return roots.length === 1
+    ? roots[0]
+    : {
+        value: 1,
+        children: roots,
+        color: "rgb(224,224,209)",
+      };
 }
 
 export default App;
