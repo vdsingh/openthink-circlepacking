@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+
 import "./App.css";
 import * as d3 from "d3";
 // import { data } from "./data/data.js";
@@ -8,15 +9,15 @@ import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
 function App() {
   const svgRef = useRef();
 
-  const width = 500;
-  const height = 500;
+  const width = 1000;
+  const height = 1000;
 
   // will be called initially and on every data change
   useEffect(() => {
     const color = d3.scaleSequential([8, 0], d3.interpolateMagma);
     const format = d3.format(",d");
 
-    var pack = (data) =>
+    let pack = (data) =>
       d3
         .pack()
         .size([width - 2, height - 2])
@@ -47,11 +48,18 @@ function App() {
     node
       .append("circle")
       .attr("r", (d) => d.r)
-      .attr("fill", (d) => d.data.color);
-
-    // .attr("fill", (d) => color(d.height));
+      .attr("fill", (d) => d.data.color)
+      .attr("stroke", "black")
+      .attr("stroke-width", "2");
 
     const leaf = node.filter((d) => !d.children);
+
+    leaf
+      .append("text")
+      .attr("style", "margin-bottom: 10px;")
+      .append("tspan")
+      .attr("class", "material-icons")
+      .text((d) => d.data.icon);
 
     leaf
       .append("text")
@@ -62,6 +70,8 @@ function App() {
       .attr("x", 0)
       .attr("y", (d, i, nodes) => `${i - nodes.length / 2 + 0.8}em`)
       .text((d) => d);
+
+    leaf.select("text");
 
     node.append("title").text(
       (d) =>
@@ -89,9 +99,21 @@ function formatData(posts, relations) {
 
   let colorMap = new Map();
   colorMap.set("Idea", "rgb(51,102,255)");
-  colorMap.set("Topic", "rgb(51,102,255)");
+  colorMap.set("Topic", "rgb(255,204,102)");
   colorMap.set("Concern", "rgb(255,0,0)");
   colorMap.set("Information", "rgb(224,224,209)");
+  colorMap.set("Action Item", "");
+  colorMap.set("Event", "");
+  colorMap.set("Question", "");
+
+  let iconMap = new Map();
+  iconMap.set("Idea", "emoji_objects");
+  iconMap.set("Topic", "device_hub");
+  iconMap.set("Concern", "error");
+  iconMap.set("Information", "info");
+  iconMap.set("Action Item", "check_circle");
+  iconMap.set("Event", "event");
+  iconMap.set("Question", "help");
 
   //map each post by ID
   posts.forEach((post) => {
@@ -99,6 +121,7 @@ function formatData(posts, relations) {
     post.children = [];
     post.value = Math.floor(Math.random() * 100);
     post.color = colorMap.get(post.type);
+    post.icon = iconMap.get(post.type);
 
     //map each post by its ID
     postsMap.set(post._id, post);
@@ -120,7 +143,7 @@ function formatData(posts, relations) {
     : {
         value: 1,
         children: roots,
-        color: "rgb(224,224,209)",
+        color: colorMap.get("Idea"),
       };
 }
 
