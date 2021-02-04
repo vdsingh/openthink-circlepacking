@@ -6,7 +6,7 @@ import { data } from "./data/data.js";
 
 import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
 
-function ZoomableCirclePacking() {
+function ZoomableCirclePack() {
   const svgRef = useRef();
 
   const width = 400;
@@ -191,4 +191,4 @@ function formatData(posts, relations) {
       };
 }
 
-export default ZoomableCirclePacking;
+export default ZoomableCirclePack;

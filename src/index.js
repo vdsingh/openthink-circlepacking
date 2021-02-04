@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import ZoomableCirclePacking from "./ZoomableCirclePacking";
+import CirclePack from "./CirclePack";
+import ZoomableCirclePack from "./ZoomableCirclePack";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
-    <ZoomableCirclePacking />
+    <CirclePack />
+    <ZoomableCirclePack />
   </React.StrictMode>,
   document.getElementById("root")
 );
