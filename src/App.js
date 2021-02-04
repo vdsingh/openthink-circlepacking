@@ -9,8 +9,8 @@ import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
 function App() {
   const svgRef = useRef();
 
-  const width = 1000;
-  const height = 1000;
+  const width = 400;
+  const height = 400;
 
   // will be called initially and on every data change
   useEffect(() => {
@@ -56,8 +56,9 @@ function App() {
 
     leaf
       .append("text")
-      .attr("style", "margin-bottom: 10px;")
       .append("tspan")
+      .attr("x", -25)
+      .attr("y", 10)
       .attr("class", "material-icons")
       .text((d) => d.data.icon);
 
@@ -119,7 +120,7 @@ function formatData(posts, relations) {
   posts.forEach((post) => {
     //give each post object a children array
     post.children = [];
-    post.value = Math.floor(Math.random() * 100);
+    post.value = Math.floor(Math.random() * 100 + 50);
     post.color = colorMap.get(post.type);
     post.icon = iconMap.get(post.type);
 

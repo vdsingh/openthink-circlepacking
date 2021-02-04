@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 
-import "./App.css";
+// import "./App.css";
 import * as d3 from "d3";
 import { data } from "./data/data.js";
 
@@ -9,11 +9,17 @@ import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
 function ZoomableCirclePacking() {
   const svgRef = useRef();
 
-  const width = 500;
-  const height = 500;
+  const width = 400;
+  const height = 400;
 
   // will be called initially and on every data change
   useEffect(() => {
+    let color = d3
+      .scaleLinear()
+      .domain([0, 5])
+      .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
+      .interpolate(d3.interpolateHcl);
+
     let pack = (data) =>
       d3.pack().size([width, height]).padding(3)(
         d3
@@ -22,18 +28,12 @@ function ZoomableCirclePacking() {
           .sort((a, b) => b.value - a.value)
       );
 
-    let color = d3
-      .scaleLinear()
-      .domain([0, 5])
-      .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
-      .interpolate(d3.interpolateHcl);
-
-    const root = pack(data);
+    const root = pack(formatData(dummyPosts, dummyRelations));
     let focus = root;
     let view;
 
-    const svg = d3
-      .create("svg")
+    const svg = d3.select(svgRef.current);
+    d3.create("svg")
       .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
       .style("display", "block")
       .style("margin", "0 -14px")
@@ -43,14 +43,30 @@ function ZoomableCirclePacking() {
 
     const node = svg
       .append("g")
+      .attr("stroke", "black")
+      .attr("stroke-width", "2")
       .selectAll("circle")
       .data(root.descendants().slice(1))
       .join("circle")
-      .attr("fill", (d) => (d.children ? color(d.depth) : "white"))
-      .attr("pointer-events", (d) => (!d.children ? "none" : null));
+      // .attr("fill", (d) => (d.children ? color(d.depth) : "white"))
+      .attr("fill", (d) => d.data.color)
+      .attr("pointer-events", (d) => (!d.children ? "none" : null))
+      .style("display", "block")
+
+      .on("mouseover", function () {
+        d3.select(this).attr("stroke", "#f54260");
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("stroke", null);
+      })
+      .on(
+        "click",
+        (event, d) => focus !== d && (zoom(event, d), event.stopPropagation())
+      );
 
     const label = svg
       .append("g")
+
       .style("font", "10px sans-serif")
       .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
@@ -59,9 +75,9 @@ function ZoomableCirclePacking() {
       .join("text")
       .style("fill-opacity", (d) => (d.parent === root ? 1 : 0))
       .style("display", (d) => (d.parent === root ? "inline" : "none"))
-      .text((d) => d.data.name);
+      .text((d) => d.data.title);
 
-    zoomTo([root.x, root.y, root.r * 2]);
+    zoomTo([root.x - width / 2, root.y - height / 2, root.r * 2]);
 
     function zoomTo(v) {
       const k = width / v[2];
@@ -88,7 +104,11 @@ function ZoomableCirclePacking() {
         .transition()
         .duration(event.altKey ? 7500 : 750)
         .tween("zoom", (d) => {
-          const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+          const i = d3.interpolateZoom(view, [
+            focus.x - focus.r,
+            focus.y - focus.r,
+            focus.r * 2,
+          ]);
           return (t) => zoomTo(i(t));
         });
 
@@ -109,7 +129,6 @@ function ZoomableCirclePacking() {
 
   return (
     <React.Fragment>
-      <span className="material-icons"></span>
       <svg ref={svgRef} width={width} height={height}></svg>
     </React.Fragment>
   );
@@ -127,13 +146,26 @@ function formatData(posts, relations) {
   colorMap.set("Topic", "rgb(255,204,102)");
   colorMap.set("Concern", "rgb(255,0,0)");
   colorMap.set("Information", "rgb(224,224,209)");
+  colorMap.set("Action Item", "");
+  colorMap.set("Event", "");
+  colorMap.set("Question", "");
+
+  let iconMap = new Map();
+  iconMap.set("Idea", "emoji_objects");
+  iconMap.set("Topic", "device_hub");
+  iconMap.set("Concern", "error");
+  iconMap.set("Information", "info");
+  iconMap.set("Action Item", "check_circle");
+  iconMap.set("Event", "event");
+  iconMap.set("Question", "help");
 
   //map each post by ID
   posts.forEach((post) => {
     //give each post object a children array
     post.children = [];
-    post.value = Math.floor(Math.random() * 100);
+    post.value = Math.floor(Math.random() * 100 + 50);
     post.color = colorMap.get(post.type);
+    post.icon = iconMap.get(post.type);
 
     //map each post by its ID
     postsMap.set(post._id, post);
