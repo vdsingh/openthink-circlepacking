@@ -7,7 +7,6 @@ import ZoomableCirclePack from "./ZoomableCirclePack";
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <CirclePack /> */}
     <ZoomableCirclePack />
   </React.StrictMode>,
   document.getElementById("root")

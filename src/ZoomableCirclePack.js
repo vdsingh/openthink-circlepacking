@@ -66,8 +66,8 @@ function ZoomableCirclePack() {
         "click",
         (event, d) => focus !== d && (zoom(event, d), event.stopPropagation())
       )
-      .on("dblclick", function () {
-        window.open("https://www.google.com");
+      .on("dblclick", function (event, d) {
+        window.open("https://www.google.com/");
       });
 
     svg.style("background-color", "#A3F5CF");
@@ -75,7 +75,6 @@ function ZoomableCirclePack() {
     const label = svg
       .append("g")
       .attr("class", "titles")
-      .style("font", "10px sans-serif")
       .style("font", "20px sans-serif")
       .style("font-weight", "bold")
       .style(
@@ -95,6 +94,11 @@ function ZoomableCirclePack() {
       .append("g")
       .attr("class", "icons")
       .style("font", "20px sans-serif")
+      .style(
+        "text-shadow",
+        "0 0 2px white, 0 0 2px white, 0 0 2px white, 0 0 2px white"
+      )
+      .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(root.descendants())
@@ -114,11 +118,11 @@ function ZoomableCirclePack() {
 
       label.attr(
         "transform",
-        (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
+        (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k + 10})`
       );
       icon.attr(
         "transform",
-        (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
+        (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - 10})`
       );
       node.attr(
         "transform",
