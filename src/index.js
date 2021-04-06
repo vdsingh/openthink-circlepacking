@@ -2,8 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import CirclePack from "./CirclePack";
-import ZoomableCirclePack from "./ZoomableCirclePack";
+import ZoomableCirclePack from "./components/ZoomableCirclePack";
 
 ReactDOM.render(
   <React.StrictMode>

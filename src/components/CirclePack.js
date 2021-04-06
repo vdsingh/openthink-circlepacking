@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 // import { data } from "./data/data.js";
 
-import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
+import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
 
 function CirclePack() {
   const svgRef = useRef();

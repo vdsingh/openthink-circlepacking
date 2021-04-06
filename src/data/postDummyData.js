@@ -1,6 +1,6 @@
 export const dummyPosts = [
   {
-    _id: "5f85b65d48bb5c021b8f68h8",
+    _id: "apple",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
@@ -251,7 +251,7 @@ export const dummyPosts = [
     votes: [],
     tags: [],
     title: "Child of Child 2",
-    type: "Topic",
+    type: "Idea",
     public: true,
     anon: false,
     body: "This is sample post 3",
