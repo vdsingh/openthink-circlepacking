@@ -6,7 +6,7 @@ import * as d3 from "d3";
 
 import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
 
-function CirclePack() {
+function DeprecatedCirclePack() {
   const svgRef = useRef();
 
   const width = 400;
@@ -148,4 +148,4 @@ function formatData(posts, relations) {
       };
 }
 
-export default CirclePack;
+export default DeprecatedCirclePack;

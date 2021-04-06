@@ -1,6 +1,6 @@
 export const post = [
   {
-    _id: "apple",
+    _id: "foo",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
@@ -32,5 +32,5 @@ export const post = [
       $numberInt: "32",
     },
     edited: true,
-  }
-]
+  },
+];

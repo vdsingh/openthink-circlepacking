@@ -1,6 +1,6 @@
 export const dummyPosts = [
   {
-    _id: "apple",
+    _id: "foo",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
