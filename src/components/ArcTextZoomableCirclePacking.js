@@ -1,14 +1,15 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
-import { data } from "../data/data.js";
+// import { data } from "../data/data.js";
 import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
 // import { post } from "../data/simpleData.js";
 
-function ZoomableCirclePack() {
-  var width = 700;
-  var height = 700;
+function ArcTextZoomableCirclePacking() {
   const svgRef = useRef();
+
+  const width = 700;
+  const height = 700;
 
   // will be called initially and on every data change
   useEffect(() => {
@@ -26,22 +27,15 @@ function ZoomableCirclePack() {
           .sort((a, b) => b.value - a.value)
       );
 
-    // const root = pack(formatData(dummyPosts, dummyRelations, ""));
-    const root = pack(data);
+    const root = pack(formatData(dummyPosts, dummyRelations, ""));
+    // const root = pack(formatData(post, [], ""));
 
     let focus = root;
     let view;
 
-    console.log("use effect");
-
     const svg = d3
       .select(svgRef.current)
-      .attr("viewBox", [
-        -(width + 100) / 2,
-        -(height + 100) / 2,
-        width + 100,
-        height + 100,
-      ])
+      .attr("viewBox", [-width / 2, -height / 2, width, height])
       // .style("display", "block")
       .style("margin", "20px 20px 20px 20px")
       .style("cursor", "pointer")
@@ -55,6 +49,7 @@ function ZoomableCirclePack() {
       .attr("fill", (d) => (d.children ? color(d.depth) : "white"))
       .attr("pointer-events", (d) => (!d.children ? "none" : null))
       .style("display", "block")
+      // .style()
       .on("mouseover", function () {
         d3.select(this).attr("stroke", "#000000");
       })
@@ -71,22 +66,49 @@ function ZoomableCirclePack() {
 
     svg.style("background-color", "#A3F5CF");
 
-    const label = svg
+    var paths = svg
       .append("g")
-      .attr("class", "titles")
+      .attr("class", "paths")
+      .style("font", "20px sans-serif")
       .style("font-weight", "bold")
       .style(
         "text-shadow",
         "0 0 2px white, 0 0 2px white, 0 0 2px white, 0 0 2px white"
       )
+      .style("translate", "100px")
+      .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(root.descendants())
+      .join("path")
+      .attr("id", (d) => d.data._id) //Unique id of the path
+      .attr("d", (d) => console.log(d.data.name + ": " + d.y))
+      .attr(
+        "d",
+        (d) =>
+          `M ${-(width / 2) + d.x - d.r}, ${-(height / 2) + d.y} A ${d.r}, ${
+            d.r
+          } 0 0, 1 ${-(width / 2) + d.x + d.r}, ${-(height / 2) + d.y}`
+      )
+      .style("display", "inline")
+      .style("fill", "none");
+
+    const labels = svg
+      .append("g")
+      .attr("class", "labels")
+      .style("font-weight", "bold")
+      .style(
+        "text-shadow",
+        "0 0 1px white, 0 0 1px white, 0 0 1px white, 0 0 1px white"
+      )
+      .selectAll("text")
+      .data(root.descendants())
       .join("text")
-      .attr("class", "circle-title")
-      .attr("id", (d) => "title" + d.data._id)
-      .style("font", (d) => "25px sans-serif")
-      .style("fill-opacity", (d) => (d.parent === root ? 1 : 0))
+      .append("textPath") //append a textPath to the text element
+      .attr("xlink:href", (d) => "#" + d.data._id) //place the ID of the path here
+      .style("text-anchor", "middle") //place the text halfway on the arc
+      .attr("startOffset", "50%")
+      .style("font", "20px sans-serif")
       .style("display", (d) => (d.parent === root ? "inline" : "none"))
       .text((d) => d.data.name);
 
@@ -108,35 +130,24 @@ function ZoomableCirclePack() {
       .attr("class", "material-icons")
       .text((d) => d.data.icon);
 
-    svg
-      .selectAll(".circle-title")
-      .append("span")
-      .attr("class", "material-icons")
-      .text("device_hub");
-
     zoomTo([root.x, root.y, root.r * 2]);
 
     function zoomTo(v) {
       const k = width / v[2];
+      console.log("width " + width);
 
       view = v;
 
-      label.attr("transform", (d) =>
-        d.children == null
-          ? `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
-          : `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - d.r * k - 10})`
-      );
+      // paths.attr(
+      //   "transform",
+      //   (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
+      // );
 
       icon.attr("transform", (d) =>
         d.children == null
-          ? `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - 15})`
-          : `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - d.r * k - 25})`
+          ? `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k + 10})`
+          : `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k - 5 - d.r})`
       );
-      // icon.attr("transform", (d) =>
-      //   d.children == null
-      //     ? `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k + 10})`
-      //     : `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k - 5 - d.r})`
-      // );
       node.attr(
         "transform",
         (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
@@ -156,13 +167,9 @@ function ZoomableCirclePack() {
           return (t) => zoomTo(i(t));
         });
 
-      label
+      labels
         .filter(function (d) {
-          return (
-            d.parent === focus ||
-            (d.parent != null && d.parent.parent === focus) ||
-            this.style.display === "inline"
-          );
+          return d.parent === focus || this.style.display === "inline";
         })
         .transition(transition)
         .style("fill-opacity", (d) => (d.parent === focus ? 1 : 0))
@@ -175,11 +182,7 @@ function ZoomableCirclePack() {
 
       icon
         .filter(function (d) {
-          return (
-            d.parent === focus ||
-            (d.parent != null && d.parent.parent === focus) ||
-            this.style.display === "inline"
-          );
+          return d.parent === focus || this.style.display === "inline";
         })
         .transition(transition)
         .style("fill-opacity", (d) => (d.parent === focus ? 1 : 0))
@@ -207,13 +210,13 @@ function formatData(posts, relations, filter) {
   let postsMap = new Map();
 
   let colorMap = new Map();
-  colorMap.set("Idea", "#086788)");
-  colorMap.set("Topic", "#07A0C3");
-  colorMap.set("Concern", "#F0C808");
-  colorMap.set("Information", "#FFF1D0");
-  colorMap.set("Action Item", "#DD1C1A");
-  colorMap.set("Event", "#554348");
-  colorMap.set("Question", "#7E3F8F");
+  colorMap.set("Idea", "rgb(51,102,255)");
+  colorMap.set("Topic", "rgb(255,204,102)");
+  colorMap.set("Concern", "rgb(255,0,0)");
+  colorMap.set("Information", "rgb(224,224,209)");
+  colorMap.set("Action Item", "");
+  colorMap.set("Event", "");
+  colorMap.set("Question", "");
 
   let iconMap = new Map();
   iconMap.set("Idea", "emoji_objects");
@@ -259,4 +262,4 @@ function formatData(posts, relations, filter) {
   };
 }
 
-export default ZoomableCirclePack;
+export default ArcTextZoomableCirclePacking;

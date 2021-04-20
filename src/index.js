@@ -3,10 +3,12 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import ZoomableCirclePack from "./components/ZoomableCirclePack";
+import ArcTextZoomableCirclePacking from "./components/ArcTextZoomableCirclePacking";
 
 ReactDOM.render(
   <React.StrictMode>
     <ZoomableCirclePack />
+    <ArcTextZoomableCirclePacking />
   </React.StrictMode>,
   document.getElementById("root")
 );
