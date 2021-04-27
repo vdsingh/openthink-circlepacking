@@ -75,7 +75,6 @@ function ArcTextZoomableCirclePacking() {
         "text-shadow",
         "0 0 2px white, 0 0 2px white, 0 0 2px white, 0 0 2px white"
       )
-      .style("translate", "100px")
       .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
       .selectAll("text")
@@ -210,13 +209,13 @@ function formatData(posts, relations, filter) {
   let postsMap = new Map();
 
   let colorMap = new Map();
-  colorMap.set("Idea", "rgb(51,102,255)");
-  colorMap.set("Topic", "rgb(255,204,102)");
-  colorMap.set("Concern", "rgb(255,0,0)");
-  colorMap.set("Information", "rgb(224,224,209)");
-  colorMap.set("Action Item", "");
-  colorMap.set("Event", "");
-  colorMap.set("Question", "");
+  colorMap.set("Idea", "#086788)");
+  colorMap.set("Topic", "#07A0C3");
+  colorMap.set("Concern", "#F0C808");
+  colorMap.set("Information", "#FFF1D0");
+  colorMap.set("Action Item", "#DD1C1A");
+  colorMap.set("Event", "#554348");
+  colorMap.set("Question", "#7E3F8F");
 
   let iconMap = new Map();
   iconMap.set("Idea", "emoji_objects");
@@ -231,8 +230,7 @@ function formatData(posts, relations, filter) {
   posts.forEach((post) => {
     //give each post object a children array
     post.children = [];
-    // post.value = Math.floor(Math.random() * 100 + 50);
-    post.value = 10;
+    post.value = post.votes;
     post.color = colorMap.get(post.type);
     post.icon = iconMap.get(post.type);
     post.name = post.title;
@@ -240,7 +238,7 @@ function formatData(posts, relations, filter) {
     //map each post by its ID
     postsMap.set(post._id, post);
 
-    //fill the roots array with all posts
+    //fill the roots array with all posts (we will remove non-roots later)
     if (post.type === filter || filter === "") roots.push(post);
   });
 
@@ -252,13 +250,14 @@ function formatData(posts, relations, filter) {
     }
 
     parent.children.push(child);
+
+    //we remove child from the roots array because obviously no child is a root
     if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
   }
 
   return {
     value: 1,
     children: roots,
-    color: colorMap.get("Idea"),
   };
 }
 

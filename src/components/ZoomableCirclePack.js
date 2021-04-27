@@ -26,8 +26,8 @@ function ZoomableCirclePack() {
           .sort((a, b) => b.value - a.value)
       );
 
-    // const root = pack(formatData(dummyPosts, dummyRelations, ""));
-    const root = pack(data);
+    const root = pack(formatData(dummyPosts, dummyRelations, ""));
+    // const root = pack(data);
 
     let focus = root;
     let view;
@@ -42,7 +42,6 @@ function ZoomableCirclePack() {
         width + 100,
         height + 100,
       ])
-      // .style("display", "block")
       .style("margin", "20px 20px 20px 20px")
       .style("cursor", "pointer")
       .on("click", (event) => zoom(event, root));
@@ -129,14 +128,10 @@ function ZoomableCirclePack() {
 
       icon.attr("transform", (d) =>
         d.children == null
-          ? `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - 15})`
-          : `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - d.r * k - 25})`
+          ? `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - 20})`
+          : `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k - d.r * k - 30})`
       );
-      // icon.attr("transform", (d) =>
-      //   d.children == null
-      //     ? `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k + 10})`
-      //     : `translate(${(d.x - v[0]) * k - 20},${(d.y - v[1]) * k - 5 - d.r})`
-      // );
+
       node.attr(
         "transform",
         (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
@@ -228,8 +223,7 @@ function formatData(posts, relations, filter) {
   posts.forEach((post) => {
     //give each post object a children array
     post.children = [];
-    // post.value = Math.floor(Math.random() * 100 + 50);
-    post.value = 10;
+    post.value = post.votes;
     post.color = colorMap.get(post.type);
     post.icon = iconMap.get(post.type);
     post.name = post.title;
@@ -237,7 +231,7 @@ function formatData(posts, relations, filter) {
     //map each post by its ID
     postsMap.set(post._id, post);
 
-    //fill the roots array with all posts
+    //fill the roots array with all posts (we will remove non-roots later)
     if (post.type === filter || filter === "") roots.push(post);
   });
 
@@ -249,13 +243,14 @@ function formatData(posts, relations, filter) {
     }
 
     parent.children.push(child);
+
+    //we remove child from the roots array because obviously no child is a root
     if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
   }
 
   return {
     value: 1,
     children: roots,
-    color: colorMap.get("Idea"),
   };
 }
 
