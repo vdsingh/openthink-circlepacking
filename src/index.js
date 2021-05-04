@@ -5,10 +5,17 @@ import reportWebVitals from "./reportWebVitals";
 import ZoomableCirclePack from "./components/ZoomableCirclePack";
 import ArcTextZoomableCirclePacking from "./components/ArcTextZoomableCirclePacking";
 
+import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
+
 ReactDOM.render(
   <React.StrictMode>
-    <ZoomableCirclePack />
-    <ArcTextZoomableCirclePacking />
+    <ZoomableCirclePack
+      posts={dummyPosts}
+      relations={dummyRelations}
+      width={700}
+      height={700}
+    />
+    {/* <ArcTextZoomableCirclePacking posts=dummyPosts> */}
   </React.StrictMode>,
   document.getElementById("root")
 );

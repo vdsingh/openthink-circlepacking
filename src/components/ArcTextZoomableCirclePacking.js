@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
 // import { data } from "../data/data.js";
-import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
+// import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
 // import { post } from "../data/simpleData.js";
 
 function ArcTextZoomableCirclePacking() {
@@ -27,7 +27,7 @@ function ArcTextZoomableCirclePacking() {
           .sort((a, b) => b.value - a.value)
       );
 
-    const root = pack(formatData(dummyPosts, dummyRelations, ""));
+    const root = pack(formatData(posts, relations, ""));
     // const root = pack(formatData(post, [], ""));
 
     let focus = root;
@@ -66,7 +66,7 @@ function ArcTextZoomableCirclePacking() {
 
     svg.style("background-color", "#A3F5CF");
 
-    var paths = svg
+    const paths = svg
       .append("g")
       .attr("class", "paths")
       .style("font", "20px sans-serif")
