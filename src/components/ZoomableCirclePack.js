@@ -16,7 +16,7 @@ function ZoomableCirclePack(props) {
     let grayColor = d3
       .scaleLinear()
       .domain([0, 5])
-      .range(["hsl(230,4%,77%)", "hsl(230,4%,10%)"])
+      .range(["hsla(0,0%,40%, 0.3)", "hsl(0,0%,20%, 0.3)"])
       .interpolate(d3.interpolateHcl);
 
     let pack = (data) =>
@@ -57,11 +57,15 @@ function ZoomableCirclePack(props) {
       .attr("fill", (d) => {
         if (d.data.filterOut === true) {
           //if the circle is to be filtered out, make it gray.
-          d3.interpolateRgb("lightgrey", "gray");
-          return grayColor(d.depth);
+          let col = grayColor(d.depth);
+          console.log(col);
+          return col;
+          // return color(d.depth);
         } else if (d.children) {
           //if the circle is not filtered out, and has children, then color it according to d3's coloring tools (line 11)
-          return color(d.depth);
+          let col = color(d.depth);
+          console.log(col);
+          return col;
         } else {
           //if the circle is a leaf, make it white
           return "white";
