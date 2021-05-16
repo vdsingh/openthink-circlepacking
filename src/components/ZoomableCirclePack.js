@@ -1,10 +1,13 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
+// import { randomBates } from "d3";
 
 function ZoomableCirclePack(props) {
   var width = props.width;
   var height = props.height;
   const svgRef = useRef();
+
+  // console.log(generateData());
 
   useEffect(() => {
     let color = d3
@@ -16,7 +19,7 @@ function ZoomableCirclePack(props) {
     let grayColor = d3
       .scaleLinear()
       .domain([0, 5])
-      .range(["hsla(0,0%,40%, 0.3)", "hsl(0,0%,20%, 0.3)"])
+      .range(["hsla(0,0%,40%, 0.3)", "hsl(0,0%,0%, 0.3)"])
       .interpolate(d3.interpolateHcl);
 
     let pack = (data) =>
@@ -27,7 +30,9 @@ function ZoomableCirclePack(props) {
           .sort((a, b) => b.value - a.value)
       );
 
-    const root = pack(formatData(props.posts, props.relations, ["Idea"]));
+    // const root = pack(formatData(props.posts, props.relations, ["Idea"]));
+
+    const root = pack(generateData());
 
     let focus = root;
     let view;
@@ -117,6 +122,7 @@ function ZoomableCirclePack(props) {
       //don't let the icon interfere with clicking the circles (we can click through the icon)
       .attr("pointer-events", "none")
       .style("font", "20px sans-serif")
+      .style("fill", "blue")
       .style(
         "text-shadow",
         "0 0 2px white, 0 0 2px white, 0 0 2px white, 0 0 2px white"
@@ -237,6 +243,10 @@ function formatData(posts, relations, filter) {
 
   //map each post by ID
   posts.forEach((post) => {
+    if (filter.includes(post.type)) {
+      return;
+    }
+
     //give each post object a children array
     post.children = [];
 
@@ -261,6 +271,9 @@ function formatData(posts, relations, filter) {
 
   //filter through each relation
   for (let i = 0; i < relations.length; i++) {
+    if (!postsMap.has(relations[i].post1)) continue;
+    if (!postsMap.has(relations[i].post2)) continue;
+
     //get the parent and child of the relation
     let parent = postsMap.get(relations[i].post1);
     let child = postsMap.get(relations[i].post2);
@@ -276,6 +289,28 @@ function formatData(posts, relations, filter) {
   return {
     children: roots,
   };
+}
+
+function generateData() {
+  var root = { children: [] };
+  addChildren(root, 0);
+
+  return root;
+
+  function addChildren(parentObj, depth) {
+    if (depth > 5) {
+      return;
+    }
+    for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
+      let childObj = {
+        title: "object" + i,
+        children: [],
+        value: Math.floor(Math.random() * 100),
+      };
+      parentObj.children.push(childObj);
+      addChildren(childObj, depth + 1);
+    }
+  }
 }
 
 export default ZoomableCirclePack;
