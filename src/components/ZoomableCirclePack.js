@@ -30,9 +30,16 @@ function ZoomableCirclePack(props) {
           .sort((a, b) => b.value - a.value)
       );
 
-    // const root = pack(formatData(props.posts, props.relations, ["Idea"]));
+    var root = null;
 
-    const root = pack(generateData());
+    if (props.data != null) {
+      root = pack(props.data);
+    } else {
+      root = pack(formatData(props.posts, props.relations, []));
+    }
+
+    // let data = generateData()
+    // const root = pack(generateData());
 
     let focus = root;
     let view;
@@ -289,28 +296,6 @@ function formatData(posts, relations, filter) {
   return {
     children: roots,
   };
-}
-
-function generateData() {
-  var root = { children: [] };
-  addChildren(root, 0);
-
-  return root;
-
-  function addChildren(parentObj, depth) {
-    if (depth > 5) {
-      return;
-    }
-    for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
-      let childObj = {
-        title: "object" + i,
-        children: [],
-        value: Math.floor(Math.random() * 100),
-      };
-      parentObj.children.push(childObj);
-      addChildren(childObj, depth + 1);
-    }
-  }
 }
 
 export default ZoomableCirclePack;
