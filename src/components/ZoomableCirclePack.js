@@ -1,13 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-// import { randomBates } from "d3";
 
 function ZoomableCirclePack(props) {
   var width = props.width;
   var height = props.height;
   const svgRef = useRef();
-
-  // console.log(generateData());
 
   useEffect(() => {
     let color = d3
@@ -35,7 +32,7 @@ function ZoomableCirclePack(props) {
     if (props.data != null) {
       root = pack(props.data);
     } else {
-      root = pack(formatData(props.posts, props.relations, []));
+      root = pack(formatData(props.posts, props.relations, props.filter));
     }
 
     // let data = generateData()
@@ -250,9 +247,9 @@ function formatData(posts, relations, filter) {
 
   //map each post by ID
   posts.forEach((post) => {
-    if (filter.includes(post.type)) {
-      return;
-    }
+    // if (filter.includes(post.type)) {
+    //   return;
+    // }
 
     //give each post object a children array
     post.children = [];
@@ -261,13 +258,13 @@ function formatData(posts, relations, filter) {
     post.value = post.votes;
 
     //the color attribute is not currently as use, as we are using d3's color tools.
-    post.color = colorMap.get(post.type);
+    // post.color = colorMap.get(post.type);
 
     //the icon attribute simply allows us to keep track of the string needed to get the correct icon
-    post.icon = iconMap.get(post.type);
+    // post.icon = iconMap.get(post.type);
 
     //the filterOut attributes tells us whether we need to gray out the circle, depending on the "filter" parameter.
-    post.filterOut = filter.includes(post.type);
+    // post.filterOut = filter.includes(post.type);
 
     //map each post by its ID (if we need to get the post later by the relation that it's in, we can just find it by its ID)
     postsMap.set(post._id, post);
@@ -278,18 +275,21 @@ function formatData(posts, relations, filter) {
 
   //filter through each relation
   for (let i = 0; i < relations.length; i++) {
-    if (!postsMap.has(relations[i].post1)) continue;
-    if (!postsMap.has(relations[i].post2)) continue;
+    // if (!postsMap.has(relations[i].post1)) continue;
+    // if (!postsMap.has(relations[i].post2)) continue;
 
     //get the parent and child of the relation
     let parent = postsMap.get(relations[i].post1);
     let child = postsMap.get(relations[i].post2);
 
+    if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
+
+    if (filter.includes(parent.type) || filter.includes(child.type)) continue;
+
     //add the child to the parent's children array.
     parent.children.push(child);
 
     //remove child from the roots array (no child can be a root)
-    if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
   }
 
   //return a new root containing all of the old roots as children.
