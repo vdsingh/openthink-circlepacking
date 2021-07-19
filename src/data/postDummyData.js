@@ -68,7 +68,7 @@ export const dummyPosts = [
     edited: true,
   },
   {
-    _id: "5f85b65d48bb5c021b8f68a2",
+    _id: "rightparent",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
@@ -102,7 +102,7 @@ export const dummyPosts = [
     edited: true,
   },
   {
-    _id: "5f85b65d48bb5c021b8f68d8",
+    _id: "mainparent",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
@@ -171,7 +171,7 @@ export const dummyPosts = [
   },
 
   {
-    _id: "5f85b65d48bb5c021b8f68d9",
+    _id: "mainleftchild",
     owner: [
       {
         $oid: "5f8537bb48bb5c021b8f68cd",
@@ -283,7 +283,7 @@ export const dummyRelations = [
     },
     post2: "5f85b65d48bb5c021b8f68a8",
     type: "parent-child",
-    post1: "5f85b65d48bb5c021b8f68a2",
+    post1: "rightparent",
     owner: {
       $oid: "5f85bde948bb5c021b8f68e0",
     },
@@ -298,7 +298,7 @@ export const dummyRelations = [
     },
     post2: "5f85b65d48bb5c021b8f68d6",
     type: "parent-child",
-    post1: "5f85b65d48bb5c021b8f68d8",
+    post1: "mainparent",
     owner: {
       $oid: "5f85bde948bb5c021b8f68e0",
     },
@@ -311,9 +311,9 @@ export const dummyRelations = [
     _id: {
       $oid: "5f85c73748bb5c021b8f68e",
     },
-    post2: "5f85b65d48bb5c021b8f68d9",
+    post2: "mainleftchild",
     type: "parent-child",
-    post1: "5f85b65d48bb5c021b8f68d8",
+    post1: "mainparent",
     owner: {
       $oid: "5f85bde948bb5c021b8f68e0",
     },
@@ -328,7 +328,7 @@ export const dummyRelations = [
     },
     post2: "5f85b65d48bb5c021b8f68d3",
     type: "parent-child",
-    post1: "5f85b65d48bb5c021b8f68d9",
+    post1: "mainleftchild",
     owner: {
       $oid: "5f85bde948bb5c021b8f68e0",
     },
@@ -343,7 +343,7 @@ export const dummyRelations = [
     },
     post2: "5f85b65d48bb5c021b8f68d2",
     type: "parent-child",
-    post1: "5f85b65d48bb5c021b8f68d9",
+    post1: "mainleftchild",
     owner: {
       $oid: "5f85bde948bb5c021b8f68e0",
     },

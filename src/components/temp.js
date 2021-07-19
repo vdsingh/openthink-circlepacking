@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
+// import { dummyPosts, dummyRelations } from "../data/postDummyData.js";
 
 function ZoomableCirclePack(props) {
   var width = props.width;
   var height = props.height;
-  var id = 0;
   const svgRef = useRef();
 
   useEffect(() => {
@@ -28,16 +28,13 @@ function ZoomableCirclePack(props) {
           .sort((a, b) => b.value - a.value)
       );
 
-    var root = null;
-    var formattedDat = formatData(props.posts, props.relations, props.filters);
-    var formattedData = formattedDat[0];
-    var nodeMap = formattedDat[1];
+    var root = pack(formatData(props.posts, props.relations, props.filter));
 
-    if (props.data != null) {
-      root = pack(props.data);
-    } else {
-      root = pack(formattedData);
-    }
+    // if (props.data != null) {
+    //   root = pack(props.data);
+    // } else {
+    //   root = pack(formatData(props.posts, props.relations, props.filter));
+    // }
 
     // let data = generateData()
     // const root = pack(generateData());
@@ -61,13 +58,10 @@ function ZoomableCirclePack(props) {
       //when we click on the background, zoom to the root
       .on("click", (event) => zoom(event, root));
 
-    var data = root.descendants().slice(1);
-
     const node = svg
       .append("g")
-      .attr("id", "circles")
       .selectAll("circle")
-      .data(data)
+      .data(root.descendants().slice(1))
       .join("circle")
       .attr("pointer-events", (d) => (!d.children ? "none" : null))
       .attr("fill", (d) => {
@@ -102,59 +96,12 @@ function ZoomableCirclePack(props) {
       )
       .on(
         //when we double click, open google
-        "dblclick",
-        (event, d) => {
-          // data.push({});
-          // data[0].children.push(data[2]);
-          // svg.selectAll("circle").data([data]);
-
-          // data.push({
-          //   _id: Math.random(1000),
-          //   value: 10,
-          //   title: "NEW NODE",
-          //   children: [],
-          // });
-          // d.children.push({ _id: "hello", value: 100 });
-          // console.log(d);
-          // console.log("Selected parent id: " + d.data._id);
-          // formattedData.children.push({ _id: "hello", value: 100 });
-          // // console.log(formattedData);
-          // var datar = root.descendants();
-          // node.data(datar);
-          addNode(d.data._id, nodeMap, {
-            _id: "" + id++,
-            icon: "device_hub",
-            value: 10,
-            title: "NEW ADD",
-            children: [],
-            depth: d.depth + 1,
-          });
-          root = pack(formattedData);
-          console.log(root.descendants().slice(1));
-          svg
-            .selectAll("circle")
-            .data(root.descendants().slice(1))
-            .join("circle")
-            .attr("fill", (node) => {
-              if (node.children) {
-                //if the circle is not filtered out, and has children, then color it according to d3's coloring tools (line 11)
-                let col = color(node.depth);
-                console.log(col);
-                return col;
-              } else {
-                //if the circle is a leaf, make it white
-                return "white";
-              }
-            });
-
-          // console.log(datar);
-          // svg.selectAll("circle").data(root.descendants().slice(1));
-        }
+        "dblclick"
         // () => window.open("https://www.google.com/")
       );
 
     //adding a grouping for all labels
-    var label = svg
+    const label = svg
       .append("g")
       //don't let the label interfere with clicking the circles (we can click through the text)
       .attr("pointer-events", "none")
@@ -172,7 +119,7 @@ function ZoomableCirclePack(props) {
       .style("font", () => "25px sans-serif")
       // .style("fill-opacity", (d) => (d.parent === root ? 1 : 0))
       .style("display", (d) => (d.parent === root ? "inline" : "none"))
-      .text((d) => d.data.title);
+      .text((d) => d.data.title + " (" + d.data.type + ") ");
 
     //adding a grouping for all icons
     const icon = svg
@@ -272,13 +219,6 @@ function ZoomableCirclePack(props) {
   return <svg ref={svgRef} width={width} height={height}></svg>;
 }
 
-function addNode(parentID, nodeMap, childNode) {
-  console.log(parentID);
-  nodeMap.set(childNode._id, childNode);
-  nodeMap.get(parentID).children.push(childNode);
-  console.log(nodeMap);
-}
-
 function formatData(posts, relations, filter) {
   //Array containing the root objects (the parents)
   let roots = [];
@@ -316,8 +256,7 @@ function formatData(posts, relations, filter) {
     post.children = [];
 
     //the value attribute determines how to scale the circle size. Right now, the more votes, the bigger the value and thus the bigger the circle
-    // post.value = post.votes;
-    post.value = 10;
+    post.value = post.votes;
 
     //the color attribute is not currently as use, as we are using d3's color tools.
     // post.color = colorMap.get(post.type);
@@ -355,12 +294,9 @@ function formatData(posts, relations, filter) {
   }
 
   //return a new root containing all of the old roots as children.
-  return [
-    {
-      children: roots,
-    },
-    postsMap,
-  ];
+  return {
+    children: roots,
+  };
 }
 
 // function testFilter(root) {}
