@@ -1,10 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
+import { format } from "d3";
 
 function ZoomableCirclePack(props) {
   var width = props.width;
   var height = props.height;
   var id = 0;
+
+  const [formattedData, nodeMap] = formatData(props.posts, props.relations, props.filters);
+  const [data, setData] = useState(formattedData); 
   const svgRef = useRef();
 
   useEffect(() => {
@@ -28,16 +32,16 @@ function ZoomableCirclePack(props) {
           .sort((a, b) => b.value - a.value)
       );
 
-    var root = null;
-    var formattedDat = formatData(props.posts, props.relations, props.filters);
-    var formattedData = formattedDat[0];
-    var nodeMap = formattedDat[1];
+    // var root = null;
+    // var formattedData = formatData(props.posts, props.relations, props.filters);
+    // var formattedData = formattedDat[0];
+    // var nodeMap = formattedDat[1];
 
-    if (props.data != null) {
-      root = pack(props.data);
-    } else {
-      root = pack(formattedData);
-    }
+    // if (props.data != null) {
+      // root = pack(props.data);
+    // } else {
+      const root = pack(data);
+    // }
 
     // let data = generateData()
     // const root = pack(generateData());
@@ -61,7 +65,7 @@ function ZoomableCirclePack(props) {
       //when we click on the background, zoom to the root
       .on("click", (event) => zoom(event, root));
 
-    var data = root.descendants().slice(1);
+    var slicedData = root.descendants().slice(1);
 
     const node = svg
       .append("g")
@@ -104,32 +108,24 @@ function ZoomableCirclePack(props) {
         //when we double click, open google
         "dblclick",
         (event, d) => {
-          // data.push({});
-          // data[0].children.push(data[2]);
-          // svg.selectAll("circle").data([data]);
-
-          // data.push({
-          //   _id: Math.random(1000),
-          //   value: 10,
-          //   title: "NEW NODE",
-          //   children: [],
-          // });
-          // d.children.push({ _id: "hello", value: 100 });
-          // console.log(d);
-          // console.log("Selected parent id: " + d.data._id);
-          // formattedData.children.push({ _id: "hello", value: 100 });
-          // // console.log(formattedData);
-          // var datar = root.descendants();
-          // node.data(datar);
-          addNode(d.data._id, nodeMap, {
+          // addNode(d.data._id, nodeMap, 
+          
+          const child = {
             _id: "" + id++,
             icon: "device_hub",
             value: 10,
             title: "NEW ADD",
             children: [],
             depth: d.depth + 1,
-          });
-          root = pack(formattedData);
+          };
+
+          console.log(d.data._id);
+          nodeMap.set(child._id, child);
+          nodeMap.get(d.data._id).children.push(child);
+          // console.log(nodeMap);
+
+          setData(data)
+          root = pack(data);
           console.log(root.descendants().slice(1));
           svg
             .selectAll("circle")
