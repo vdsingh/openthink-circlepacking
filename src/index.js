@@ -3,11 +3,12 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import ZoomableCirclePack from "./components/ZoomableCirclePack";
-import ArcTextZoomableCirclePacking from "./components/ArcTextZoomableCirclePacking";
+// import ArcTextZoomableCirclePacking from "./components/ArcTextZoomableCirclePacking";
 
 import { dummyPosts, dummyRelations } from "./data/postDummyData.js";
+// import CollapsibleTree from "./components/CollapsibleTree";
 // import { post } from "./data/simpleData.js";
-import { data } from "./data/data.js";
+// import { data } from "./data/data.js";
 
 // const generatedData = generateData(3, 5);
 // const unformattedData = unformatData(generatedData);
@@ -46,6 +47,7 @@ ReactDOM.render(
       width={700}
       height={700}
     />
+    {/* <CollapsibleTree></CollapsibleTree> */}
     {/* <ZoomableCirclePack
       posts={dummyPosts}
       relations={dummyRelations}
