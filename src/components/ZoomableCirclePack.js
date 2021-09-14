@@ -1,13 +1,25 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
 function ZoomableCirclePack(props) {
+  console.log("funcitonal component called.");
   var width = props.width;
   var height = props.height;
   var id = 0;
+
+  //formattedData is the structured hierarchical data. nodeMap is a dictionary of all nodes where key=nodeID and value=node
+  const formattedData = formatData(props.posts, props.relations, props.filters);
+
+  // const [data, setData] = useState(formattedData);
+  const data = formattedData;
+
+  // assignDepths(formattedData, 0);
+  console.log("Data: ", data);
+  // const data = formattedData;
   const svgRef = useRef();
 
   useEffect(() => {
+    console.log("useEffect called.");
     let color = d3
       .scaleLinear()
       .domain([0, 5])
@@ -28,19 +40,7 @@ function ZoomableCirclePack(props) {
           .sort((a, b) => b.value - a.value)
       );
 
-    var root = null;
-    var formattedDat = formatData(props.posts, props.relations, props.filters);
-    var formattedData = formattedDat[0];
-    var nodeMap = formattedDat[1];
-
-    if (props.data != null) {
-      root = pack(props.data);
-    } else {
-      root = pack(formattedData);
-    }
-
-    // let data = generateData()
-    // const root = pack(generateData());
+    var root = pack(data);
 
     let focus = root;
     let view;
@@ -48,7 +48,7 @@ function ZoomableCirclePack(props) {
     const svg = d3
       .select(svgRef.current)
       .attr("viewBox", [
-        //we are just adding space (the +100) between the circles and the edges so that nothing get's cut off
+        //we are just adding space (the +100) between the circles and the edges so that nothing gets cut off
         -(width + 100) / 2,
         -(height + 100) / 2,
         width + 100,
@@ -61,13 +61,14 @@ function ZoomableCirclePack(props) {
       //when we click on the background, zoom to the root
       .on("click", (event) => zoom(event, root));
 
-    var data = root.descendants().slice(1);
+    //slice out the parent object (this object is used to contain all the roots and isn't an actual node)
+    var slicedData = root.descendants().slice(1);
 
     const node = svg
       .append("g")
       .attr("id", "circles")
       .selectAll("circle")
-      .data(data)
+      .data(slicedData)
       .join("circle")
       .attr("pointer-events", (d) => (!d.children ? "none" : null))
       .attr("fill", (d) => {
@@ -103,54 +104,7 @@ function ZoomableCirclePack(props) {
       .on(
         //when we double click, open google
         "dblclick",
-        (event, d) => {
-          // data.push({});
-          // data[0].children.push(data[2]);
-          // svg.selectAll("circle").data([data]);
-
-          // data.push({
-          //   _id: Math.random(1000),
-          //   value: 10,
-          //   title: "NEW NODE",
-          //   children: [],
-          // });
-          // d.children.push({ _id: "hello", value: 100 });
-          // console.log(d);
-          // console.log("Selected parent id: " + d.data._id);
-          // formattedData.children.push({ _id: "hello", value: 100 });
-          // // console.log(formattedData);
-          // var datar = root.descendants();
-          // node.data(datar);
-          addNode(d.data._id, nodeMap, {
-            _id: "" + id++,
-            icon: "device_hub",
-            value: 10,
-            title: "NEW ADD",
-            children: [],
-            depth: d.depth + 1,
-          });
-          root = pack(formattedData);
-          console.log(root.descendants().slice(1));
-          svg
-            .selectAll("circle")
-            .data(root.descendants().slice(1))
-            .join("circle")
-            .attr("fill", (node) => {
-              if (node.children) {
-                //if the circle is not filtered out, and has children, then color it according to d3's coloring tools (line 11)
-                let col = color(node.depth);
-                console.log(col);
-                return col;
-              } else {
-                //if the circle is a leaf, make it white
-                return "white";
-              }
-            });
-
-          // console.log(datar);
-          // svg.selectAll("circle").data(root.descendants().slice(1));
-        }
-        // () => window.open("https://www.google.com/")
+        () => window.open("https://www.google.com/")
       );
 
     //adding a grouping for all labels
@@ -267,16 +221,8 @@ function ZoomableCirclePack(props) {
           if (d.parent !== focus) this.style.display = "none";
         });
     }
-  }, []);
-
+  });
   return <svg ref={svgRef} width={width} height={height}></svg>;
-}
-
-function addNode(parentID, nodeMap, childNode) {
-  console.log(parentID);
-  nodeMap.set(childNode._id, childNode);
-  nodeMap.get(parentID).children.push(childNode);
-  console.log(nodeMap);
 }
 
 function formatData(posts, relations, filter) {
@@ -284,7 +230,7 @@ function formatData(posts, relations, filter) {
   let roots = [];
 
   //map to get posts by id {postID, postObject}
-  let postsMap = new Map();
+  let postsMap = {};
 
   //maps the type of post to the color that the circle should be (not currently in use)
   let colorMap = new Map();
@@ -316,8 +262,8 @@ function formatData(posts, relations, filter) {
     post.children = [];
 
     //the value attribute determines how to scale the circle size. Right now, the more votes, the bigger the value and thus the bigger the circle
-    // post.value = post.votes;
-    post.value = 10;
+    post.value = post.votes;
+    // post.value = 10;
 
     //the color attribute is not currently as use, as we are using d3's color tools.
     // post.color = colorMap.get(post.type);
@@ -329,7 +275,8 @@ function formatData(posts, relations, filter) {
     // post.filterOut = filter.includes(post.type);
 
     //map each post by its ID (if we need to get the post later by the relation that it's in, we can just find it by its ID)
-    postsMap.set(post._id, post);
+    // postsMap.set(post._id, post);
+    postsMap[post._id] = post;
 
     //fill the roots array with all posts (we will remove non-roots later - once we see that a node is a child it cannot be a root, so we'll remove it)
     roots.push(post);
@@ -341,10 +288,10 @@ function formatData(posts, relations, filter) {
     // if (!postsMap.has(relations[i].post2)) continue;
 
     //get the parent and child of the relation
-    let parent = postsMap.get(relations[i].post1);
-    let child = postsMap.get(relations[i].post2);
-
-    if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
+    // let parent = postsMap.get(relations[i].post1);
+    let parent = postsMap[relations[i].post1];
+    // let child = postsMap.get(relations[i].post2);
+    let child = postsMap[relations[i].post2];
 
     // if (filter.includes(parent.type) || filter.includes(child.type)) continue;
 
@@ -352,17 +299,12 @@ function formatData(posts, relations, filter) {
     parent.children.push(child);
 
     //remove child from the roots array (no child can be a root)
+    if (roots.includes(child)) roots.splice(roots.indexOf(child), 1);
   }
 
+  let parentObj = { children: roots };
+
   //return a new root containing all of the old roots as children.
-  return [
-    {
-      children: roots,
-    },
-    postsMap,
-  ];
+  return parentObj;
 }
-
-// function testFilter(root) {}
-
 export default ZoomableCirclePack;
