@@ -8,11 +8,7 @@ function ZoomableCirclePack(props) {
   var id = 0;
 
   //formattedData is the structured hierarchical data. nodeMap is a dictionary of all nodes where key=nodeID and value=node
-  const [formattedData, nodeMap] = formatData(
-    props.posts,
-    props.relations,
-    props.filters
-  );
+  const formattedData = formatData(props.posts, props.relations, props.filters);
 
   // const [data, setData] = useState(formattedData);
   const data = formattedData;
@@ -105,7 +101,6 @@ function ZoomableCirclePack(props) {
         "click",
         (event, d) => focus !== d && (zoom(event, d), event.stopPropagation())
       )
-      //ORIGINAL VERSION OF ON DOUBLE CLICK
       .on(
         //when we double click, open google
         "dblclick",
@@ -310,9 +305,6 @@ function formatData(posts, relations, filter) {
   let parentObj = { children: roots };
 
   //return a new root containing all of the old roots as children.
-  return [parentObj, postsMap];
+  return parentObj;
 }
-
-// function testFilter(root) {}
-
 export default ZoomableCirclePack;
